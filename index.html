@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBBS 3 Physics Assignment Tracker - Q53-Q91</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.0/firebase-database-compat.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Animate.css for animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.3rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header .subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            animation: fadeIn 1s ease-out 0.3s both;
+        }
+
+        .header .helper {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+            animation: fadeIn 1s ease-out 0.4s both;
+        }
+
+        .deadline {
+            display: inline-block;
+            margin-top: 0.3rem;
+            padding: 0.3rem 0.8rem;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-color);
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            animation: fadeIn 1s ease-out 0.5s both;
+        }
+
+        /* Dashboard Cards */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.3rem;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.2s; }
+        .stat-card:nth-child(2) { animation-delay: 0.3s; }
+        .stat-card:nth-child(3) { animation-delay: 0.4s; }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.8rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-1);
+            transition: width 0.5s ease;
+        }
+
+        /* Groups Section */
+        .groups-section h2 {
+            margin-bottom: 1.2rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 1.4rem;
+            animation: fadeIn 0.8s ease-out 0.5s both;
+        }
+
+        .search-box {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            width: 250px;
+            font-size: 0.9rem;
+            animation: fadeInRight 0.8s ease-out 0.6s both;
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 1.3rem;
+        }
+
+        .group-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.4rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        /* Staggered animations for group cards */
+        .group-card:nth-child(1) { animation-delay: 0.3s; }
+        .group-card:nth-child(2) { animation-delay: 0.4s; }
+        .group-card:nth-child(3) { animation-delay: 0.5s; }
+        .group-card:nth-child(4) { animation-delay: 0.6s; }
+        .group-card:nth-child(5) { animation-delay: 0.7s; }
+        .group-card:nth-child(6) { animation-delay: 0.8s; }
+        .group-card:nth-child(7) { animation-delay: 0.9s; }
+        .group-card:nth-child(8) { animation-delay: 1.0s; }
+        .group-card:nth-child(9) { animation-delay: 1.1s; }
+        .group-card:nth-child(10) { animation-delay: 1.2s; }
+        .group-card:nth-child(11) { animation-delay: 1.3s; }
+        .group-card:nth-child(12) { animation-delay: 1.4s; }
+        .group-card:nth-child(13) { animation-delay: 1.5s; }
+
+        .group-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .group-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+
+        .group-questions {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: var(--border-color);
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+        }
+
+        .task-list {
+            margin: 0.8rem 0;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            margin-bottom: 0.4rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .task-checkbox {
+            width: 17px;
+            height: 17px;
+            margin-right: 0.7rem;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .task-label {
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* Member List */
+        .member-list {
+            margin-top: 0.8rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.8rem;
+        }
+
+        .member-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+
+        .member-count {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            margin-bottom: 0.4rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .member-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .member-checkbox {
+            width: 15px;
+            height: 15px;
+            margin-right: 0.7rem;
+            accent-color: var(--secondary-color);
+            cursor: pointer;
+        }
+
+        .member-name {
+            font-size: 0.85rem;
+            flex-grow: 1;
+        }
+
+        .member-id {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+            animation: fadeIn 1s ease-out 1.6s both;
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.2rem;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .dashboard, .groups-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .groups-section h2 {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+        }
+
+        /* Status indicators */
+        .last-updated {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            animation: fadeIn 1s ease-out 1.5s both;
+        }
+
+        /* Pulse animation for real-time indicator */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .real-time-indicator {
+            display: inline-block;
+            margin-left: 0.3rem;
+            animation: pulse 2s infinite;
+            color: var(--secondary-color);
+        }
+
+        /* Custom animations */
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Tooltip for member IDs */
+        .member-id {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .member-id:hover::after {
+            content: 'Click to copy ID';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            box-shadow: var(--shadow-lg);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🧬 MBBS 3 Physics Assignment</h1>
+            <p class="subtitle">Questions 53-91 • Group Work Tracker</p>
+            <p class="helper">Floating Helper: TAIWO AYOMIDE TEMITOPE</p>
+            <div class="deadline">⏰ Submission Deadline: July 18, 2024</div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <div class="stat-card">
+                <div class="stat-number" id="groups-started">0/13</div>
+                <div class="stat-label">Groups Started</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="started-bar"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-number" id="groups-completed">0/13</div>
+                <div class="stat-label">Groups Completed</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="completed-bar"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-number" id="attendance-rate">0%</div>
+                <div class="stat-label">Attendance Rate</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="attendance-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Groups Section -->
+        <div class="groups-section">
+            <h2>
+                <span>Group Progress</span>
+                <input type="text" class="search-box" placeholder="Search groups or members..." id="search-input">
+            </h2>
+            <div class="groups-grid" id="groups-container">
+                <!-- Groups will be dynamically generated here -->
+            </div>
+        </div>
+
+        <div class="last-updated">
+            Last updated: <span id="update-time"></span> 
+            <span class="real-time-indicator">• Live Updates</span>
+        </div>
+    </div>
+
+    <div class="footer">
+        Created for 100L MBBS 3 by <strong><a href="https://x.com/iamayonimous" target="_blank">Ayonimous</a></strong> • 
+        <a href="#" id="refresh-link">Refresh Page</a> •
+        <span id="page-load-time"></span>
+    </div>
+
+    <script>
+        // Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyD4-vhtAtBw7RsphPeBTCY1MvtHmvEiLrY",
+  authDomain: "mbbs-physics-tracker.firebaseapp.com",
+  databaseURL: "https://mbbs-physics-tracker-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "mbbs-physics-tracker",
+  storageBucket: "mbbs-physics-tracker.firebasestorage.app",
+  messagingSenderId: "523610128084",
+  appId: "1:523610128084:web:8aab07577772c882250541"
+};
+
+// Initialize Firebase
+// Removed: const app = initializeApp(firebaseConfig); // Not needed in compat version
+        let database = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            console.log("Firebase connected successfully");
+        } catch (error) {
+            console.warn('Firebase not configured:', error);
+        }
+
+        // Group data - ALL 13 GROUPS INCLUDED
+        const groupsData = [
+            { id: 1, questions: "53-55", members: [
+                { name: "OLATUNJI MOTOLANI BLESSING", id: "MED/24/5560" },
+                { name: "OLAWANLE FOYINSOLAMI PRISCILLA", id: "MED/24/5561" },
+                { name: "OLLEY TEMISANREN PHOEBE", id: "MED/24/5562" },
+                { name: "OLORUNFEMI JESUDARASIMI GOODLUCK", id: "MED/24/5563" }
+            ]},
+            { id: 2, questions: "56-58", members: [
+                { name: "OLORUNFEMI JOSEPH OLABAMIJI", id: "MED/24/5564" },
+                { name: "OLORUNSOGO PEACE OLUWATIMILEYIN", id: "MED/24/5565" },
+                { name: "OLOWOGBADE DELIGHT AYOMIDE", id: "MED/24/5566" },
+                { name: "OLOWOPETOYE AYOMIDE DEBORAH", id: "MED/24/5567" }
+            ]},
+            { id: 3, questions: "59-61", members: [
+                { name: "OLOWOSUSI EWAOLUWA EUNICE", id: "MED/24/5568" },
+                { name: "OLUBAMISE EMMANUEL JESUDARASIMI", id: "MED/24/5569" },
+                { name: "OLUFUNSHO ALEXANDER OLUKAYODE", id: "MED/24/5570" },
+                { name: "OLUGBOJA JOSHUA ADEKUNLE", id: "MED/24/5571" }
+            ]},
+            { id: 4, questions: "62-64", members: [
+                { name: "OLUSOLA LOVETH TEMILOLUWA", id: "MED/24/5572" },
+                { name: "OLUWALAMI OLUWAMODUPE PETER", id: "MED/24/5573" },
+                { name: "OLUWASANYI FAITH TAYE", id: "MED/24/5574" },
+                { name: "OLUWASOGBE MOMOIYIOLUWA SUCCESS", id: "MED/24/5575" }
+            ]},
+            { id: 5, questions: "65-67", members: [
+                { name: "OLUWASOLA TIMILEHIN EMMANUEL", id: "MED/24/5576" },
+                { name: "OMOBA MERCY AYANFEOLUWA", id: "MED/24/5577" },
+                { name: "OMODE JOY OLAMIDE", id: "MED/24/5578" },
+                { name: "OMOLAGBA TESTIMONY DAVID", id: "MED/24/5579" }
+            ]},
+            { id: 6, questions: "68-70", members: [
+                { name: "OMOLE OLUWABUSAYOMI PETER", id: "MED/24/5580" },
+                { name: "OMONUBERU ELIZABETH OLUWAKOREDE", id: "MED/24/5581" },
+                { name: "OMOSUYI JOAN OLUWAFERANMI", id: "MED/24/5582" },
+                { name: "OMOTOLA OMOWASOLA OLUWADARASIMI", id: "MED/24/5583" }
+            ]},
+            { id: 7, questions: "71-73", members: [
+                { name: "ONI AKINWALE OLADUNJOYE", id: "MED/24/5584" },
+                { name: "ONI PRECIOUS TEMITAYO", id: "MED/24/5585" },
+                { name: "ORJI BRIDGET ADAEZE", id: "MED/24/5586" },
+                { name: "OSEMENAM ELIZABETH CHIDIMA", id: "MED/24/5587" }
+            ]},
+            { id: 8, questions: "74-76", members: [
+                { name: "OWOLABI ESTHER OLUWAFIKUNOLAMI", id: "MED/24/5588" },
+                { name: "OWOSENI DANIEL OLUWAFEMI", id: "MED/24/5589" },
+                { name: "OWOSENI MOSES OLABANJI", id: "MED/24/5590" },
+                { name: "OWOWUNMI OLUWASEUN AYOMIDE", id: "MED/24/5591" }
+            ]},
+            { id: 9, questions: "77-79", members: [
+                { name: "OYEBADE ISAIAH ADEWALE", id: "MED/24/5592" },
+                { name: "OYEGOKE AYOMIDE EMMANUEL", id: "MED/24/5593" },
+                { name: "OYEGOKE PEACE OLUWATOMISIN", id: "MED/24/5594" },
+                { name: "OYEWOLE TENIOLA FIK'AYOMI", id: "MED/24/5595" }
+            ]},
+            { id: 10, questions: "80-82", members: [
+                { name: "OYINKOLAWA TAIWO DAMOLA", id: "MED/24/5596" },
+                { name: "OYUTU EPEREMOH TESTIMONY", id: "MED/24/5597" },
+                { name: "PELEMO GBEMILEKE FEYIKEMI", id: "MED/24/5598" },
+                { name: "SALAMI ODUNAYO OLUWANIFEMI", id: "MED/24/5599" }
+            ]},
+            { id: 11, questions: "83-85", members: [
+                { name: "SASA JOSEPHINE OLUWATIMILEHIN", id: "MED/24/5600" },
+                { name: "SEGUN-BOYEDE FORTUNATE INIOLUWA", id: "MED/24/5601" },
+                { name: "SIMON-EMIEJE GODFREY OGHENEFEGHO", id: "MED/24/5602" },
+                { name: "SOTILOYE ABRAHAM OLUWASEYIFUNMI", id: "MED/24/5603" }
+            ]},
+            { id: 12, questions: "86-88", members: [
+                { name: "STONEWHYTE-AJAYI STELLA OMOBOLANLE", id: "MED/24/5604" },
+                { name: "TAIWO MOTUNRAYO DEBORAH", id: "MED/24/5606" },
+                { name: "TOWOLAWI PECULIAR OLUWAFIMIDARA", id: "MED/24/5607" },
+                { name: "UKACHUKWU CHIMAMAKA SUCCESS", id: "MED/24/5608" }
+            ]},
+            { id: 13, questions: "89-91", members: [
+                { name: "UMAR-BALOGUN ZAINAB OLATUNDE", id: "MED/24/5609" },
+                { name: "USMAN MISTURA AYOMIDE", id: "MED/24/5610" },
+                { name: "YUSUF ABDULRAHMAN ABIOLA", id: "MED/24/5611" },
+                { name: "YUSUF MAZEEDAH OLUWABUKUNMI", id: "MED/24/5612" }
+            ]}
+        ];
+
+        // Track page load time
+        const pageLoadTime = new Date();
+        document.getElementById('page-load-time').textContent = `Loaded at ${pageLoadTime.toLocaleTimeString()}`;
+
+        // Refresh link
+        document.getElementById('refresh-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            location.reload();
+        });
+
+        // Copy member ID on click
+        function setupCopyMemberId() {
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('member-id')) {
+                    const memberId = e.target.textContent;
+                    navigator.clipboard.writeText(memberId).then(() => {
+                        const originalText = e.target.textContent;
+                        e.target.textContent = 'Copied!';
+                        setTimeout(() => {
+                            e.target.textContent = originalText;
+                        }, 2000);
+                    });
+                }
+            });
+        }
+
+        // Render group cards
+        function renderGroups() {
+            const container = document.getElementById('groups-container');
+            container.innerHTML = '';
+            
+            groupsData.forEach(group => {
+                const groupCard = document.createElement('div');
+                groupCard.className = 'group-card';
+                groupCard.setAttribute('data-group-id', group.id);
+                groupCard.setAttribute('data-questions', group.questions);
+                
+                // Create member list items
+                const memberItems = group.members.map(member => `
+                    <div class="member-item" data-member-id="${member.id}" data-member-name="${member.name.toLowerCase()}">
+                        <input type="checkbox" class="member-checkbox" id="member-${group.id}-${member.id}" 
+                               data-group="${group.id}" data-member="${member.id}">
+                        <div class="member-name">${member.name}</div>
+                        <div class="member-id">${member.id}</div>
+                    </div>
+                `).join('');
+                
+                groupCard.innerHTML = `
+                    <div class="group-header">
+                        <div class="group-title">Group ${group.id}</div>
+                        <div class="group-questions">Questions ${group.questions}</div>
+                    </div>
+                    
+                    <div class="task-list">
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox" id="group-${group.id}-started" 
+                                   data-group="${group.id}" data-task="started">
+                            <label class="task-label" for="group-${group.id}-started">Started Work</label>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox" id="group-${group.id}-completed" 
+                                   data-group="${group.id}" data-task="completed">
+                            <label class="task-label" for="group-${group.id}-completed">Questions Completed</label>
+                        </div>
+                    </div>
+                    
+                    <div class="member-list">
+                        <div class="member-header">
+                            <div class="member-count">Members: ${group.members.length}</div>
+                            <div class="attendance-count" id="attendance-count-${group.id}">0/${group.members.length} present</div>
+                        </div>
+                        ${memberItems}
+                    </div>
+                `;
+                
+                container.appendChild(groupCard);
+            });
+            
+            // Initialize event listeners
+            initCheckboxes();
+            setupSearch();
+            setupCopyMemberId();
+        }
+
+        // Initialize checkboxes with real-time updates
+        function initCheckboxes() {
+            // Task checkboxes
+            document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+                const group = checkbox.dataset.group;
+                const task = checkbox.dataset.task;
+                const path = `groups/group${group}/${task}`;
+                
+                // Load initial state and set up real-time listener
+                loadData(path, (value) => {
+                    checkbox.checked = value || false;
+                    updateGroupStatus(group);
+                    updateDashboard();
+                });
+                
+                // Save on change
+                checkbox.addEventListener('change', () => {
+                    saveData(path, checkbox.checked);
+                });
+            });
+
+            // Attendance checkboxes
+            document.querySelectorAll('.member-checkbox').forEach(checkbox => {
+                const group = checkbox.dataset.group;
+                const member = checkbox.dataset.member;
+                const path = `attendance/group${group}/${member}`;
+                
+                // Load initial state and set up real-time listener
+                loadData(path, (value) => {
+                    checkbox.checked = value || false;
+                    updateAttendanceCount(group);
+                    updateDashboard();
+                });
+                
+                // Save on change
+                checkbox.addEventListener('change', () => {
+                    saveData(path, checkbox.checked);
+                });
+            });
+        }
+
+        // Set up search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const groupCards = document.querySelectorAll('.group-card');
+                
+                groupCards.forEach(card => {
+                    const groupId = card.getAttribute('data-group-id');
+                    const questions = card.getAttribute('data-questions');
+                    const members = card.querySelectorAll('.member-item');
+                    
+                    // Check if search term matches group number or questions
+                    const matchesGroup = groupId.includes(searchTerm) || 
+                                        questions.includes(searchTerm);
+                    
+                    // Check if any member matches
+                    let matchesMember = false;
+                    members.forEach(member => {
+                        const memberName = member.getAttribute('data-member-name');
+                        const memberId = member.getAttribute('data-member-id').toLowerCase();
+                        
+                        if (memberName.includes(searchTerm) || memberId.includes(searchTerm)) {
+                            matchesMember = true;
+                            member.style.display = 'flex';
+                        } else {
+                            member.style.display = 'none';
+                        }
+                    });
+                    
+                    // Show/hide group card based on matches
+                    if (matchesGroup || matchesMember || searchTerm === '') {
+                        card.style.display = 'block';
+                        // Show all members if no search term
+                        if (searchTerm === '') {
+                            members.forEach(member => {
+                                member.style.display = 'flex';
+                            });
+                        }
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Update attendance count for a group
+        function updateAttendanceCount(groupId) {
+            const checkboxes = document.querySelectorAll(`.member-checkbox[data-group="${groupId}"]`);
+            let presentCount = 0;
+            
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) presentCount++;
+            });
+            
+            const countElement = document.getElementById(`attendance-count-${groupId}`);
+            if (countElement) {
+                countElement.textContent = `${presentCount}/${checkboxes.length} present`;
+                countElement.style.color = presentCount === checkboxes.length ? 
+                    'var(--secondary-color)' : 'var(--text-secondary)';
+            }
+        }
+
+        // Update group status (started/completed)
+        function updateGroupStatus(groupId) {
+            const startedCheckbox = document.querySelector(`.task-checkbox[data-group="${groupId}"][data-task="started"]`);
+            const completedCheckbox = document.querySelector(`.task-checkbox[data-group="${groupId}"][data-task="completed"]`);
+            const groupCard = document.querySelector(`.group-card[data-group-id="${groupId}"]`);
+            
+            if (!groupCard) return;
+            
+            // Reset all status classes
+            groupCard.style.borderLeft = 'none';
+            
+            // Add appropriate border color based on status
+            if (completedCheckbox && completedCheckbox.checked) {
+                groupCard.style.borderLeft = '4px solid var(--secondary-color)';
+            } else if (startedCheckbox && startedCheckbox.checked) {
+                groupCard.style.borderLeft = '4px solid var(--primary-color)';
+            }
+        }
+
+        // Update dashboard statistics
+        function updateDashboard() {
+            let startedCount = 0;
+            let completedCount = 0;
+            let totalAttendance = 0;
+            let totalMembers = 0;
+
+            groupsData.forEach(group => {
+                // Check group status
+                const startedCheckbox = document.querySelector(`.task-checkbox[data-group="${group.id}"][data-task="started"]`);
+                const completedCheckbox = document.querySelector(`.task-checkbox[data-group="${group.id}"][data-task="completed"]`);
+                
+                if (startedCheckbox?.checked) startedCount++;
+                if (completedCheckbox?.checked) completedCount++;
+                
+                // Calculate attendance
+                const memberCheckboxes = document.querySelectorAll(`.member-checkbox[data-group="${group.id}"]`);
+                memberCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) totalAttendance++;
+                    totalMembers++;
+                });
+                
+                // Update individual group attendance
+                updateAttendanceCount(group.id);
+                updateGroupStatus(group.id);
+            });
+
+            // Update dashboard numbers
+            document.getElementById('groups-started').textContent = `${startedCount}/${groupsData.length}`;
+            document.getElementById('groups-completed').textContent = `${completedCount}/${groupsData.length}`;
+            
+            // Update progress bars
+            document.getElementById('started-bar').style.width = `${(startedCount/groupsData.length)*100}%`;
+            document.getElementById('completed-bar').style.width = `${(completedCount/groupsData.length)*100}%`;
+            
+            // Update attendance
+            const attendancePercentage = totalMembers > 0 ? 
+                Math.round((totalAttendance / totalMembers) * 100) : 0;
+            document.getElementById('attendance-rate').textContent = `${attendancePercentage}%`;
+            document.getElementById('attendance-bar').style.width = `${attendancePercentage}%`;
+            
+            // Update timestamp
+            document.getElementById('update-time').textContent = new Date().toLocaleString();
+        }
+
+        // Save data to Firebase
+        function saveData(path, value) {
+            if (database) {
+                database.ref(path).set(value)
+                    .then(() => console.log('Data saved to Firebase'))
+                    .catch(error => console.error('Firebase save error:', error));
+            } else {
+                localStorage.setItem(path, JSON.stringify(value));
+            }
+        }
+
+        // Load data from Firebase or localStorage with real-time listener
+        function loadData(path, callback) {
+            if (database) {
+                database.ref(path).on('value', (snapshot) => {
+                    callback(snapshot.val());
+                });
+            } else {
+                const data = localStorage.getItem(path);
+                callback(data ? JSON.parse(data) : null);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            renderGroups();
+            updateDashboard();
+            
+            // Update timestamp every minute
+            setInterval(() => {
+                document.getElementById('update-time').textContent = new Date().toLocaleString();
+            }, 60000);
+        });
+    </script>
+</body>
+</html>
